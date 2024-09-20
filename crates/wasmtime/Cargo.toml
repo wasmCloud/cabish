@@ -1,0 +1,17 @@
+[package]
+name = "wasmtime-cabish"
+version = "0.1.0"
+description = "Wasmtime cabish integration"
+
+authors.workspace = true
+categories.workspace = true
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+tracing = { workspace = true }
+wasmtime = { workspace = true }
+wasmtime-wasi = { workspace = true }

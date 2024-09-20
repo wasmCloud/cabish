@@ -1,0 +1,31 @@
+[package]
+name = "cabish"
+version = "0.1.0"
+description = "Component model ABI-ish for native code"
+
+authors.workspace = true
+categories.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[workspace]
+members = ["crates/*"]
+
+[workspace.package]
+authors = ["Roman Volosatovs <rvolosatovs@riseup.net>"]
+categories = ["wasm"]
+edition = "2021"
+homepage = "https://github.com/rvolosatovs/cabish"
+license = "Apache-2.0 WITH LLVM-exception"
+repository = "https://github.com/rvolosatovs/cabish"
+
+[dependencies]
+wasmtime-cabish = { workspace = true }
+
+[workspace.dependencies]
+anyhow = { version = "1", default-features = false }
+tracing = { version = "0.1", default-features = false }
+wasmtime = { version = "24", default-features = false }
+wasmtime-cabish = { version = "0.1.0", path = "./crates/wasmtime" }
+wasmtime-wasi = { version = "24", default-features = false }
