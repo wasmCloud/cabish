@@ -6,13 +6,15 @@ use core::ptr::{copy_nonoverlapping, null, NonNull};
 use std::alloc::{alloc, alloc_zeroed};
 
 use anyhow::{bail, ensure, Context as _};
+use cabish::{find_enum_discriminant, flag_bits};
 use tracing::{instrument, trace};
 use wasmtime::component::{Type, Val};
 use wasmtime::Store;
 use wasmtime_wasi::WasiView;
 
 use crate::{
-    align_of, align_of_result, find_enum_discriminant, find_variant_discriminant, flag_bits, max_case_alignment, size_of, size_of_option, size_of_result, size_of_variant
+    align_of, align_of_result, find_variant_discriminant, max_case_alignment, size_of,
+    size_of_option, size_of_result, size_of_variant,
 };
 
 #[instrument(level = "debug", skip(store, ty, src), ret(level = "debug"))]

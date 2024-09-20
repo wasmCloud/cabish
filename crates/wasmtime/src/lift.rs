@@ -3,6 +3,7 @@ use core::iter::zip;
 use core::ptr::NonNull;
 
 use anyhow::{bail, ensure, Context as _};
+use cabish::deref_arg;
 use tracing::instrument;
 use wasmtime::component::{types, Resource, ResourceAny, ResourceType, Type, Val};
 use wasmtime::Store;
@@ -12,14 +13,6 @@ use crate::{
     align_of, align_of_result, args_of, args_of_variant, max_case_alignment, size_of_option,
     size_of_result, size_of_variant,
 };
-
-fn deref_arg<T>(args: *const *mut c_void) -> anyhow::Result<(NonNull<T>, *const *mut c_void)> {
-    let args: NonNull<*mut c_void> =
-        NonNull::new(args.cast_mut()).context("argument cannot be null")?;
-    let data = unsafe { args.read() };
-    let data = NonNull::new(data.cast()).context("value cannot be null")?;
-    Ok((data, args.as_ptr().wrapping_add(1)))
-}
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
 fn lift_bool(dst: &mut Val, src: NonNull<c_void>) -> *const c_void {

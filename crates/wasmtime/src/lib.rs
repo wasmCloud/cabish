@@ -1,8 +1,5 @@
 use core::iter::zip;
 use core::mem;
-use core::ops::{BitOrAssign, Shl};
-
-use std::collections::HashSet;
 
 use anyhow::Context as _;
 use tracing::instrument;
@@ -11,15 +8,9 @@ use wasmtime::component::{types, Type};
 mod lift;
 mod lower;
 
+pub use cabish::*;
 pub use lift::lift_params;
 pub use lower::lower_results;
-
-#[repr(C)]
-#[derive(Debug)]
-pub struct List<T> {
-    pub ptr: *const T,
-    pub len: usize,
-}
 
 #[instrument(level = "trace")]
 pub fn align_of_record(ty: &types::Record) -> usize {
@@ -212,30 +203,6 @@ pub fn args_of(ty: &Type) -> usize {
         Type::Option(ty) => args_of(&ty.ty()).saturating_add(1),
         Type::Result(ty) => args_of_result(ty),
     }
-}
-
-fn flag_bits<'a, T: BitOrAssign + Shl<u8, Output = T> + From<u8>>(
-    names: impl IntoIterator<Item = &'a str>,
-    flags: impl IntoIterator<Item = &'a str>,
-) -> T {
-    let mut v = T::from(0);
-    let flags: HashSet<&str> = flags.into_iter().collect();
-    for (i, name) in zip(0u8.., names) {
-        if flags.contains(name) {
-            v |= T::from(1) << i;
-        }
-    }
-    v
-}
-
-fn find_enum_discriminant<'a, T>(
-    iter: impl IntoIterator<Item = T>,
-    names: impl IntoIterator<Item = &'a str>,
-    disc: &str,
-) -> anyhow::Result<T> {
-    zip(iter, names)
-        .find_map(|(i, name)| (name == disc).then_some(i))
-        .context("unknown enum discriminant")
 }
 
 fn find_variant_discriminant<'a, T>(

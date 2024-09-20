@@ -1,6 +1,6 @@
 [package]
 name = "wasmtime-cabish"
-version = "0.1.1"
+version = "0.1.2"
 description = "Wasmtime cabish integration"
 
 authors.workspace = true
@@ -12,6 +12,7 @@ repository.workspace = true
 
 [dependencies]
 anyhow = { workspace = true }
+cabish = { workspace = true }
 tracing = { workspace = true }
 wasmtime = { workspace = true }
 wasmtime-wasi = { workspace = true }

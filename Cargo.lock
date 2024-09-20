@@ -108,9 +108,9 @@ checksum = "428d9aa8fbc0670b7b8d6030a7fadd0f86151cae55e4dbbece15f3780a3dfaf3"
 
 [[package]]
 name = "cabish"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
- "wasmtime-cabish",
+ "anyhow",
 ]
 
 [[package]]
@@ -1294,9 +1294,10 @@ dependencies = [
 
 [[package]]
 name = "wasmtime-cabish"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
+ "cabish",
  "tracing",
  "wasmtime",
  "wasmtime-wasi",
