@@ -21,12 +21,6 @@ pub struct List<T> {
     pub len: usize,
 }
 
-#[repr(C)]
-#[derive(Debug)]
-pub struct Config {
-    pub wasm: List<u8>,
-}
-
 #[instrument(level = "trace")]
 pub fn align_of_record(ty: &types::Record) -> usize {
     ty.fields().map(|ty| align_of(&ty.ty)).max().unwrap_or(1)

@@ -1,6 +1,6 @@
 [package]
 name = "cabish"
-version = "0.1.0"
+version = "0.1.1"
 description = "Component model ABI-ish for native code"
 
 authors.workspace = true
@@ -27,5 +27,5 @@ wasmtime-cabish = { workspace = true }
 anyhow = { version = "1", default-features = false }
 tracing = { version = "0.1", default-features = false }
 wasmtime = { version = "24", default-features = false }
-wasmtime-cabish = { version = "0.1.0", path = "./crates/wasmtime" }
+wasmtime-cabish = { version = "0.1.1", path = "./crates/wasmtime" }
 wasmtime-wasi = { version = "24", default-features = false }
