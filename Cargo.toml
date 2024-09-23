@@ -1,11 +1,12 @@
 [package]
 name = "cabish"
-version = "0.1.4"
+version = "0.1.5"
 description = "Component model ABI-ish for native code"
 
 authors.workspace = true
 categories.workspace = true
 edition.workspace = true
+homepage.workspace = true
 license.workspace = true
 repository.workspace = true
 
