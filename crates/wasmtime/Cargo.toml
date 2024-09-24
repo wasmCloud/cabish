@@ -1,6 +1,6 @@
 [package]
 name = "wasmtime-cabish"
-version = "0.1.2"
+version = "0.2.0"
 description = "Wasmtime cabish integration"
 
 authors.workspace = true
