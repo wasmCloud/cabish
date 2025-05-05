@@ -11,11 +11,9 @@ use tracing::{instrument, trace};
 use wasmtime::component::{Type, Val};
 use wasmtime::Store;
 
-use crate::CabishView;
-
 use crate::{
     align_of, align_of_result, find_variant_discriminant, max_case_alignment, size_of,
-    size_of_option, size_of_result, size_of_variant,
+    size_of_option, size_of_result, size_of_variant, CabishView,
 };
 
 #[instrument(level = "debug", skip(store, ty, src), ret(level = "debug"))]

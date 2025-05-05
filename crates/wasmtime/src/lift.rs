@@ -6,13 +6,11 @@ use anyhow::{bail, ensure, Context as _};
 use cabish::deref_arg;
 use tracing::instrument;
 use wasmtime::component::{types, Resource, ResourceAny, ResourceType, Type, Val};
-use wasmtime::Store;
-
-use crate::CabishView;
+use wasmtime::AsContextMut;
 
 use crate::{
     align_of, align_of_result, args_of, args_of_variant, max_case_alignment, size_of_option,
-    size_of_result, size_of_variant,
+    size_of_result, size_of_variant, CabishView,
 };
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
@@ -122,8 +120,8 @@ fn lift_string(dst: &mut Val, src: NonNull<c_void>) -> anyhow::Result<*const c_v
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_list(
-    store: &mut Store<impl CabishView>,
+fn lift_list<T: CabishView>(
+    mut store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::List,
@@ -141,7 +139,7 @@ fn lift_list(
             }
             let src = NonNull::new(data.cast_mut())
                 .with_context(|| format!("list element `{i}` pointer cannot be null"))?;
-            data = lift(store, &ty, v, src)
+            data = lift(store.as_context_mut(), &ty, v, src)
                 .with_context(|| format!("failed to lift list element `{i}`"))?;
         }
         *dst = Val::List(vs);
@@ -152,8 +150,8 @@ fn lift_list(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_record(
-    store: &mut Store<impl CabishView>,
+fn lift_record<T: CabishView>(
+    mut store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::Record,
@@ -169,7 +167,7 @@ fn lift_record(
         }
         let src = NonNull::new(data.cast_mut())
             .with_context(|| format!("record field `{i}` pointer cannot be null"))?;
-        data = lift(store, &ty.ty, &mut v, src)
+        data = lift(store.as_context_mut(), &ty.ty, &mut v, src)
             .with_context(|| format!("failed to lift record field `{i}`"))?;
         vs.push((ty.name.to_string(), v));
     }
@@ -178,8 +176,8 @@ fn lift_record(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_tuple(
-    store: &mut Store<impl CabishView>,
+fn lift_tuple<T: CabishView>(
+    mut store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::Tuple,
@@ -194,7 +192,7 @@ fn lift_tuple(
         }
         let src = NonNull::new(data.cast_mut())
             .with_context(|| format!("tuple element `{i}` pointer cannot be null"))?;
-        data = lift(store, &ty, v, src)
+        data = lift(store.as_context_mut(), &ty, v, src)
             .with_context(|| format!("failed to lift tuple element `{i}`"))?;
     }
     *dst = Val::Tuple(vs);
@@ -239,8 +237,8 @@ fn read_variant_case(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_variant(
-    store: &mut Store<impl CabishView>,
+fn lift_variant<T: CabishView>(
+    store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::Variant,
@@ -318,8 +316,8 @@ fn lift_flags(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_option(
-    store: &mut Store<impl CabishView>,
+fn lift_option<T: CabishView>(
+    store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::OptionType,
@@ -347,8 +345,8 @@ fn lift_option(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_result(
-    store: &mut Store<impl CabishView>,
+fn lift_result<T: CabishView>(
+    store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::ResultType,
@@ -395,14 +393,15 @@ fn lift_result(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_own(
-    store: &mut Store<impl CabishView>,
+fn lift_own<T: CabishView>(
+    mut store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &ResourceType,
 ) -> anyhow::Result<*const c_void> {
     let src = src.cast::<u32>();
     let rep = unsafe { src.read() };
+    let mut store = store.as_context_mut();
     let res = store
         .data_mut()
         .table()
@@ -414,14 +413,15 @@ fn lift_own(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_borrow(
-    store: &mut Store<impl CabishView>,
+fn lift_borrow<T: CabishView>(
+    mut store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &ResourceType,
 ) -> anyhow::Result<*const c_void> {
     let src = src.cast::<u32>();
     let rep = unsafe { src.read() };
+    let mut store = store.as_context_mut();
     let res = store
         .data_mut()
         .table()
@@ -432,8 +432,8 @@ fn lift_borrow(
 }
 
 #[instrument(level = "debug", skip_all, ret(level = "debug"))]
-fn lift(
-    store: &mut Store<impl CabishView>,
+fn lift<T: CabishView>(
+    store: impl AsContextMut<Data = T>,
     ty: &Type,
     dst: &mut Val,
     src: NonNull<c_void>,
@@ -466,8 +466,8 @@ fn lift(
 }
 
 #[instrument(level = "debug", skip_all, ret(level = "debug"))]
-fn lift_param(
-    store: &mut Store<impl CabishView>,
+fn lift_param<T: CabishView>(
+    mut store: impl AsContextMut<Data = T>,
     ty: &Type,
     val: &mut Val,
     args: *const *mut c_void,
@@ -592,7 +592,7 @@ fn lift_param(
                     }
                     let src = NonNull::new(data.cast_mut())
                         .with_context(|| format!("list element `{i}` cannot be null"))?;
-                    data = lift(store, &ty, dst, src)
+                    data = lift(store.as_context_mut(), &ty, dst, src)
                         .with_context(|| format!("failed to lift list element `{i}`"))?;
                 }
                 *val = Val::List(vs);
@@ -607,7 +607,7 @@ fn lift_param(
             let mut args = args;
             for (i, ty) in fields.enumerate() {
                 let mut v = Val::Bool(false);
-                args = lift_param(store, &ty.ty, &mut v, args)
+                args = lift_param(store.as_context_mut(), &ty.ty, &mut v, args)
                     .with_context(|| format!("failed to lift record field `{i}`"))?;
                 vs.push((ty.name.to_string(), v));
             }
@@ -619,7 +619,7 @@ fn lift_param(
             let mut vs = vec![Val::Bool(false); types.len()];
             let mut args = args;
             for (i, (ty, v)) in zip(types, &mut vs).enumerate() {
-                args = lift_param(store, &ty, v, args)
+                args = lift_param(store.as_context_mut(), &ty, v, args)
                     .with_context(|| format!("failed to lift tuple element `{i}`"))?;
             }
             *val = Val::Tuple(vs);
@@ -714,8 +714,8 @@ fn lift_param(
 }
 
 #[instrument(level = "debug", skip_all, ret(level = "debug"))]
-pub fn lift_params(
-    store: &mut Store<impl CabishView>,
+pub fn lift_params<T: CabishView>(
+    mut store: impl AsContextMut<Data = T>,
     tys: &[Type],
     args: *const *mut c_void,
 ) -> anyhow::Result<(Vec<Val>, *const *mut c_void)> {
@@ -726,9 +726,33 @@ pub fn lift_params(
     let results = zip(&mut vals, tys).enumerate().try_fold(
         args,
         |args, (i, (val, ty))| -> anyhow::Result<_> {
-            lift_param(store, ty, val, args)
+            lift_param(store.as_context_mut(), ty, val, args)
                 .with_context(|| format!("failed to lift parameter {i}"))
         },
     )?;
     Ok((vals, results))
+}
+
+#[instrument(level = "debug", skip_all, ret(level = "debug"))]
+pub fn lift_results<T: CabishView>(
+    mut store: impl AsContextMut<Data = T>,
+    tys: &[Type],
+    results: *const c_void,
+    vals: &mut [Val],
+) -> anyhow::Result<()> {
+    debug_assert_eq!(tys.len(), vals.len());
+
+    if tys.is_empty() {
+        return Ok(());
+    }
+    zip(vals, tys).enumerate().try_fold(
+        results,
+        |results, (i, (val, ty))| -> anyhow::Result<_> {
+            let results = NonNull::new(results.cast_mut())
+                .with_context(|| format!("failed to result {i} pointer cannot be null"))?;
+            lift(store.as_context_mut(), ty, val, results)
+                .with_context(|| format!("failed to lift result {i}"))
+        },
+    )?;
+    Ok(())
 }
