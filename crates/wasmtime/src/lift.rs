@@ -7,7 +7,8 @@ use cabish::deref_arg;
 use tracing::instrument;
 use wasmtime::component::{types, Resource, ResourceAny, ResourceType, Type, Val};
 use wasmtime::Store;
-use wasmtime_wasi::WasiView;
+
+use crate::CabishView;
 
 use crate::{
     align_of, align_of_result, args_of, args_of_variant, max_case_alignment, size_of_option,
@@ -122,7 +123,7 @@ fn lift_string(dst: &mut Val, src: NonNull<c_void>) -> anyhow::Result<*const c_v
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
 fn lift_list(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::List,
@@ -152,7 +153,7 @@ fn lift_list(
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
 fn lift_record(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::Record,
@@ -178,7 +179,7 @@ fn lift_record(
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
 fn lift_tuple(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::Tuple,
@@ -239,7 +240,7 @@ fn read_variant_case(
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
 fn lift_variant(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::Variant,
@@ -318,7 +319,7 @@ fn lift_flags(
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
 fn lift_option(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::OptionType,
@@ -347,7 +348,7 @@ fn lift_option(
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
 fn lift_result(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &types::ResultType,
@@ -395,7 +396,7 @@ fn lift_result(
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
 fn lift_own(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &ResourceType,
@@ -414,7 +415,7 @@ fn lift_own(
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
 fn lift_borrow(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     dst: &mut Val,
     src: NonNull<c_void>,
     ty: &ResourceType,
@@ -432,7 +433,7 @@ fn lift_borrow(
 
 #[instrument(level = "debug", skip_all, ret(level = "debug"))]
 fn lift(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     ty: &Type,
     dst: &mut Val,
     src: NonNull<c_void>,
@@ -466,7 +467,7 @@ fn lift(
 
 #[instrument(level = "debug", skip_all, ret(level = "debug"))]
 fn lift_param(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     ty: &Type,
     val: &mut Val,
     args: *const *mut c_void,
@@ -714,7 +715,7 @@ fn lift_param(
 
 #[instrument(level = "debug", skip_all, ret(level = "debug"))]
 pub fn lift_params(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     tys: &[Type],
     args: *const *mut c_void,
 ) -> anyhow::Result<(Vec<Val>, *const *mut c_void)> {
