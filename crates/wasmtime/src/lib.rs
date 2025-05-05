@@ -9,7 +9,7 @@ mod lift;
 mod lower;
 
 pub use cabish::*;
-pub use lift::lift_params;
+pub use lift::{lift_params, lift_results};
 pub use lower::lower_results;
 
 pub trait CabishView {
