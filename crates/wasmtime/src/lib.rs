@@ -3,7 +3,7 @@ use core::mem;
 
 use anyhow::Context as _;
 use tracing::instrument;
-use wasmtime::component::{types, Type};
+use wasmtime::component::{types, ResourceTable, Type};
 
 mod lift;
 mod lower;
@@ -11,6 +11,10 @@ mod lower;
 pub use cabish::*;
 pub use lift::lift_params;
 pub use lower::lower_results;
+
+pub trait CabishView {
+    fn table(&mut self) -> &mut ResourceTable;
+}
 
 #[instrument(level = "trace")]
 pub fn align_of_record(ty: &types::Record) -> usize {

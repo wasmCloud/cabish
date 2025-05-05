@@ -10,7 +10,8 @@ use cabish::{find_enum_discriminant, flag_bits};
 use tracing::{instrument, trace};
 use wasmtime::component::{Type, Val};
 use wasmtime::Store;
-use wasmtime_wasi::WasiView;
+
+use crate::CabishView;
 
 use crate::{
     align_of, align_of_result, find_variant_discriminant, max_case_alignment, size_of,
@@ -19,7 +20,7 @@ use crate::{
 
 #[instrument(level = "debug", skip(store, ty, src), ret(level = "debug"))]
 fn lower(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     ty: &Type,
     dst: NonNull<c_void>,
     src: Val,
@@ -311,7 +312,7 @@ fn lower(
 
 #[instrument(level = "debug", skip_all, ret(level = "debug"))]
 pub fn lower_results(
-    store: &mut Store<impl WasiView>,
+    store: &mut Store<impl CabishView>,
     vals: Vec<Val>,
     tys: &[Type],
     args: *const *mut c_void,
