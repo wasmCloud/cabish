@@ -120,7 +120,7 @@ fn lift_string(dst: &mut Val, src: NonNull<c_void>) -> anyhow::Result<*const c_v
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_list<T: CabishView + 'static>(
+fn lift_list<T: CabishView>(
     mut store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
@@ -150,7 +150,7 @@ fn lift_list<T: CabishView + 'static>(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_record<T: CabishView + 'static>(
+fn lift_record<T: CabishView>(
     mut store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
@@ -176,7 +176,7 @@ fn lift_record<T: CabishView + 'static>(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_tuple<T: CabishView + 'static>(
+fn lift_tuple<T: CabishView>(
     mut store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
@@ -237,7 +237,7 @@ fn read_variant_case(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_variant<T: CabishView + 'static>(
+fn lift_variant<T: CabishView>(
     store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
@@ -316,7 +316,7 @@ fn lift_flags(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_option<T: CabishView + 'static>(
+fn lift_option<T: CabishView>(
     store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
@@ -345,7 +345,7 @@ fn lift_option<T: CabishView + 'static>(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_result<T: CabishView + 'static>(
+fn lift_result<T: CabishView>(
     store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
@@ -393,7 +393,7 @@ fn lift_result<T: CabishView + 'static>(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_own<T: CabishView + 'static>(
+fn lift_own<T: CabishView>(
     mut store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
@@ -413,7 +413,7 @@ fn lift_own<T: CabishView + 'static>(
 }
 
 #[instrument(level = "trace", skip_all, ret(level = "trace"))]
-fn lift_borrow<T: CabishView + 'static>(
+fn lift_borrow<T: CabishView>(
     mut store: impl AsContextMut<Data = T>,
     dst: &mut Val,
     src: NonNull<c_void>,
@@ -432,7 +432,7 @@ fn lift_borrow<T: CabishView + 'static>(
 }
 
 #[instrument(level = "debug", skip_all, ret(level = "debug"))]
-fn lift<T: CabishView + 'static>(
+fn lift<T: CabishView>(
     store: impl AsContextMut<Data = T>,
     ty: &Type,
     dst: &mut Val,
@@ -466,7 +466,7 @@ fn lift<T: CabishView + 'static>(
 }
 
 #[instrument(level = "debug", skip_all, ret(level = "debug"))]
-fn lift_param<T: CabishView + 'static>(
+fn lift_param<T: CabishView>(
     mut store: impl AsContextMut<Data = T>,
     ty: &Type,
     val: &mut Val,
@@ -714,7 +714,7 @@ fn lift_param<T: CabishView + 'static>(
 }
 
 #[instrument(level = "debug", skip_all, ret(level = "debug"))]
-pub fn lift_params<T: CabishView + 'static>(
+pub fn lift_params<T: CabishView>(
     mut store: impl AsContextMut<Data = T>,
     tys: &[Type],
     args: *const *mut c_void,
@@ -734,7 +734,7 @@ pub fn lift_params<T: CabishView + 'static>(
 }
 
 #[instrument(level = "debug", skip_all, ret(level = "debug"))]
-pub fn lift_results<T: CabishView + 'static>(
+pub fn lift_results<T: CabishView>(
     mut store: impl AsContextMut<Data = T>,
     tys: &[Type],
     results: *const c_void,
