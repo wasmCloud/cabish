@@ -226,7 +226,7 @@ fn read_discriminant(src: NonNull<c_void>, cases: usize) -> anyhow::Result<(usiz
 fn read_variant_case(
     src: NonNull<c_void>,
     ty: &types::Variant,
-) -> anyhow::Result<(types::Case, *const c_void)> {
+) -> anyhow::Result<(types::Case<'_>, *const c_void)> {
     let mut cases = ty.cases();
     let (disc, src) =
         read_discriminant(src, cases.len()).context("failed to read variant discriminant")?;
@@ -462,6 +462,9 @@ fn lift<T: CabishView + 'static>(
         Type::Flags(ty) => lift_flags(dst, src, ty),
         Type::Own(ty) => lift_own(store, dst, src, ty),
         Type::Borrow(ty) => lift_borrow(store, dst, src, ty),
+        Type::Future(_ty) => bail!("lifting futures not supported yet"),
+        Type::Stream(_ty) => bail!("lifting streams not supported yet"),
+        Type::ErrorContext => bail!("lifting error contexts not supported yet"),
     }
 }
 
@@ -710,6 +713,9 @@ fn lift_param<T: CabishView + 'static>(
             lift_borrow(store, val, rep, ty)?;
             Ok(args)
         }
+        Type::Future(_ty) => bail!("lifting futures not supported yet"),
+        Type::Stream(_ty) => bail!("lifting streams not supported yet"),
+        Type::ErrorContext => bail!("lifting error contexts not supported yet"),
     }
 }
 

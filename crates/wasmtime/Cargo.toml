@@ -1,6 +1,6 @@
 [package]
 name = "wasmtime-cabish"
-version = "0.6.0"
+version = "0.7.0"
 description = "Wasmtime cabish integration"
 
 authors.workspace = true
@@ -15,3 +15,6 @@ anyhow = { workspace = true }
 cabish = { workspace = true }
 tracing = { workspace = true, features = ["attributes"] }
 wasmtime = { workspace = true, features = ["component-model", "runtime"] }
+
+[dev-dependencies]
+wasmtime = { workspace = true, features = ["std"] }
