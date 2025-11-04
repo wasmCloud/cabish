@@ -304,6 +304,11 @@ fn lower(
             unsafe { dst.write(res.rep()) };
             Ok(dst.as_ptr().wrapping_add(1).cast())
         }
+        (Val::Future(..), Type::Future(..)) => bail!("lowering futures not supported yet"),
+        (Val::Stream(..), Type::Stream(..)) => bail!("lowering streams not supported yet"),
+        (Val::ErrorContext(..), Type::ErrorContext) => {
+            bail!("lowering error contexts not supported yet")
+        }
         _ => bail!("type mismatch"),
     }
 }

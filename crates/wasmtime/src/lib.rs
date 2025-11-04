@@ -63,7 +63,15 @@ pub fn align_of(ty: &Type) -> usize {
     match ty {
         Type::Bool | Type::S8 | Type::U8 => 1,
         Type::S16 | Type::U16 => 2,
-        Type::S32 | Type::U32 | Type::Float32 | Type::Char | Type::Own(_) | Type::Borrow(_) => 4,
+        Type::S32
+        | Type::U32
+        | Type::Float32
+        | Type::Char
+        | Type::Own(_)
+        | Type::Borrow(_)
+        | Type::Future(_)
+        | Type::Stream(_)
+        | Type::ErrorContext => 4,
         Type::S64 | Type::U64 | Type::Float64 => 8,
         Type::String | Type::List(_) => mem::align_of::<(*const (), usize)>(),
         Type::Record(ty) => align_of_record(ty),
@@ -144,7 +152,15 @@ pub fn size_of(ty: &Type) -> usize {
     match ty {
         Type::Bool | Type::S8 | Type::U8 => 1,
         Type::S16 | Type::U16 => 2,
-        Type::S32 | Type::U32 | Type::Float32 | Type::Char | Type::Own(_) | Type::Borrow(_) => 4,
+        Type::S32
+        | Type::U32
+        | Type::Float32
+        | Type::Char
+        | Type::Own(_)
+        | Type::Borrow(_)
+        | Type::Future(_)
+        | Type::Stream(_)
+        | Type::ErrorContext => 4,
         Type::S64 | Type::U64 | Type::Float64 => 8,
         Type::String | Type::List(_) => mem::size_of::<(*const (), usize)>(),
         Type::Record(ty) => size_of_record(ty),
@@ -199,7 +215,10 @@ pub fn args_of(ty: &Type) -> usize {
         | Type::U64
         | Type::Float64
         | Type::Enum(_)
-        | Type::Flags(_) => 1,
+        | Type::Flags(_)
+        | Type::Future(_)
+        | Type::Stream(_)
+        | Type::ErrorContext => 1,
         Type::String | Type::List(_) => 2,
         Type::Record(ty) => ty.fields().map(|ty| args_of(&ty.ty)).sum(),
         Type::Tuple(ty) => ty.types().map(|ty| args_of(&ty)).sum(),
