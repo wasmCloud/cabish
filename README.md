@@ -1,3 +1,7 @@
+> [!WARNING]
+> This repository is archived and is no longer maintained. It receives no bug fixes or security updates.
+> The source, tags, and existing releases are retained for historical reference.
+
 ## What?
 
 Cabish is kind of, sort of like [Wasm component model ABI] with native endian and pointer size, it's _cabi-ish_.
